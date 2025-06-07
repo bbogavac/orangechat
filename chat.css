@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=FontName&display=swap');
+
+body{
+  
+  background: linear-gradient(
+  50deg,
+  orange 35%, 
+  orange 45%, 
+  yellow 50%, 
+  green 55%, 
+  green 65%
+);
+    margin-top: 100px;
+    margin-bottom: 500px;
+    margin-left: 225.25px;
+    margin-right: 225.25px;
+}
+#chat-box{
+    background-color: rgba(227, 228, 230, 0.747);
+    margin-bottom: 10px;
+    border-radius: 15px;
+    overflow-y: scroll;
+    padding: 10px 30px 10px 10px;
+    
+}
+#message{
+    border-radius: 10px;
+    border: 5px;
+}
+button {
+  background-color: orange; /* narandžasta boja */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease; 
+  border-radius: 10px;
+  font-weight: bold;
+  margin-left: 10px;
+  width: 80px;
+  font-family: 'Fredericka the Great', cursive;
+}
+
+button:hover {
+  background-color: green; /* svetlija/nova boja kad pređe miš */
+}
+h1{
+    font-family: 'Fredericka the Great', cursive;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.877);
+}
+::placeholder{
+    font-family: 'Fredericka the Great', cursive;
+}
