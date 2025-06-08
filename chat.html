@@ -1,66 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="stylesheet" href="chat.css">
-<title>Orange Chat App</title>
-<style>
-  body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; }
-  #chat-box { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; }
-  #message { width: 80%; padding: 10px; }
-  #send-btn { padding: 10px 20px; }
-  .msg { margin: 5px 0; padding: 5px; border-radius: 4px; background: #f1f1f1; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Orange Chat App</title>
+  <link rel="stylesheet" href="chat.css" />
 </head>
 <body>
 
-<img src="7-orange-png-image-download.png" alt="Slika" width="80px" height="80px" style="margin-bottom: -70px;">
-<h1>Orange Chat</h1>
-<div id="chat-box"></div>
+  <img src="7-orange-png-image-download.png" alt="Slika" width="80px" height="80px" style="margin-bottom: -20px;">
+  <h1 class="blur-shadow">Orange Chat</h1>
 
-<input type="text" id="message" placeholder="Type a message..." autocomplete="off" />
-<button id="send-btn">Send</button>
+  <audio id="messageSound" src="notification.mp3" preload="auto"></audio>
 
-<script>
-  const chatBox = document.getElementById("chat-box");
-  const input = document.getElementById("message");
-  const sendBtn = document.getElementById("send-btn");
+  <label for="username">Enter your initial:</label><br>
+  <input type="text" id="username" placeholder="e.g. B" maxlength="2">
+  <button id="join-btn">Join Chat</button>
 
-  // Otvori WebSocket konekciju na Python backend
-  const socket = new WebSocket("ws://127.0.0.1:8000/ws/chat");
+  <div id="chat-box"></div>
 
-  socket.onopen = () => {
-    console.log("Connected to chat server");
-  };
+  <input type="text" id="message" placeholder="Type a message..." autocomplete="off" />
+  <button id="send-btn">Send</button>
 
-  socket.onmessage = event => {
-    const message = event.data;
-    const msgElem = document.createElement("div");
-    msgElem.textContent = message;
-    msgElem.classList.add("msg");
-    chatBox.appendChild(msgElem);
-    chatBox.scrollTop = chatBox.scrollHeight; // skroluj na dno
-  };
+  <script>
+    const chatBox = document.getElementById("chat-box");
+    const input = document.getElementById("message");
+    const sendBtn = document.getElementById("send-btn");
+    const joinBtn = document.getElementById("join-btn");
+    const usernameInput = document.getElementById("username");
 
-  socket.onclose = () => {
-    console.log("Disconnected from chat server");
-  };
+     // DODATO: referenca na audio
+    const messageSound = document.getElementById("messageSound");
 
-  sendBtn.onclick = () => {
-    const msg = input.value.trim();
-    if (msg) {
-      socket.send(msg);
-      input.value = "";
+     // DODATO: funkcija za puštanje zvuka
+    function playNotificationSound() {
+      messageSound.currentTime = 0;
+      messageSound.play();
     }
-  };
 
-  input.addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-      sendBtn.click();
-    }
-  });
-</script>
+    let socket;
+    let username = "";
 
+    joinBtn.onclick = () => {
+      username = usernameInput.value.trim().substring(0, 2).toUpperCase();
+      if (!username) {
+        alert("Please enter your initial.");
+        return;
+      }
+
+      usernameInput.style.display = "none";
+      joinBtn.style.display = "none";
+      chatBox.style.display = "block";
+      input.style.display = "inline-block";
+      sendBtn.style.display = "inline-block";
+
+      socket = new WebSocket("ws://127.0.0.1:8000/ws/chat");
+
+      socket.onopen = () => {
+        console.log("Connected to chat server");
+      };
+
+      socket.onmessage = event => {
+        const message = event.data;
+        const msgElem = document.createElement("div");
+        msgElem.textContent = message;
+        msgElem.classList.add("msg");
+        chatBox.appendChild(msgElem);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+         playNotificationSound();  // <-- DODATO: zvuk na prijem poruke
+      };
+
+      socket.onclose = () => {
+        console.log("Disconnected from chat server");
+      };
+
+      sendBtn.onclick = () => {
+        const msg = input.value.trim();
+        if (msg) {
+          socket.send(`${username}: ${msg}`);
+          input.value = "";
+          playNotificationSound(); 
+        }
+      };
+
+      input.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+          sendBtn.click();
+        }
+      });
+    };
+  </script>
 </body>
 </html>
